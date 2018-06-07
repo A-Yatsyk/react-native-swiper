@@ -437,12 +437,15 @@ export default class extends Component {
         this.setState(newState, () => {
           this.setState({ offset: offset }, cb)
         })
+        console.log('1 offset: ', offset, 'newState: ', newState)
       } else {
         newState.offset = offset
         this.setState(newState, cb)
+        console.log('2 newState: ', newState)
       }
     } else {
       this.setState(newState, cb)
+      console.log('3 newState: ', newState)
     }
   }
 
