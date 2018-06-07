@@ -426,6 +426,7 @@ export default class extends Component {
 
     // only update offset in state if loopJump is true
     if (loopJump) {
+      console.log('loopJump: ', loopJump)
       // when swiping to the beginning of a looping set for the third time,
       // the new offset will be the same as the last one set in state.
       // Setting the offset to the same thing will not do anything,
