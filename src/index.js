@@ -347,6 +347,7 @@ export default class extends Component {
    * @param  {object} e native event
    */
   onScrollEnd = e => {
+    this.props.onScrollEnd && this.props.onScrollEnd(e.nativeEvent.contentOffset)
     // update scroll state
     this.internals.isScrolling = false
 
@@ -362,7 +363,6 @@ export default class extends Component {
     this.updateIndex(e.nativeEvent.contentOffset, this.state.dir, () => {
       this.autoplay()
       this.loopJump()
-      console.log('updateIndex')
       // if `onMomentumScrollEnd` registered will be called here
       this.props.onMomentumScrollEnd && this.props.onMomentumScrollEnd(e, this.fullState(), this)
     })
@@ -426,7 +426,6 @@ export default class extends Component {
 
     // only update offset in state if loopJump is true
     if (loopJump) {
-      console.log('loopJump: ', loopJump)
       // when swiping to the beginning of a looping set for the third time,
       // the new offset will be the same as the last one set in state.
       // Setting the offset to the same thing will not do anything,
@@ -438,15 +437,12 @@ export default class extends Component {
         this.setState(newState, () => {
           this.setState({ offset: offset }, cb)
         })
-        console.log('1 offset: ', offset, 'newState: ', newState)
       } else {
         newState.offset = offset
         this.setState(newState, cb)
-        console.log('2 newState: ', newState)
       }
     } else {
       this.setState(newState, cb)
-      console.log('3 newState: ', newState)
     }
   }
 
