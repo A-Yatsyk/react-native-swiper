@@ -476,16 +476,16 @@ export default class extends Component {
 
     // trigger onScrollEnd manually in android
     if (!animated || Platform.OS !== 'ios') {
-    // if (!animated) {
-      setImmediate(() => {
-        this.onScrollEnd({
-          nativeEvent: {
-            position: diff
-          }
+      if (!animated) {
+        setImmediate(() => {
+          this.onScrollEnd({
+            nativeEvent: {
+              position: diff
+            }
+          })
         })
-      })
+      }
     }
-    //}
   }
 
   scrollViewPropOverrides = () => {
