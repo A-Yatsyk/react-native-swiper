@@ -154,6 +154,7 @@ export default class extends Component {
   static defaultProps = {
     horizontal: true,
     pagingEnabled: true,
+    scrollEnabled: true,
     showsHorizontalScrollIndicator: false,
     showsVerticalScrollIndicator: false,
     bounces: false,
@@ -292,11 +293,11 @@ export default class extends Component {
     // related to https://github.com/leecade/react-native-swiper/issues/570
     // contentOffset is not working in react 0.48.x so we need to use scrollTo
     // to emulate offset.
-    // if (Platform.OS === 'ios') {
+    if (Platform.OS === 'ios') {
       if (this.initialRender && this.state.total > 1) {
         this.scrollView.scrollTo({...offset, animated: false})
         this.initialRender = false;
-      // }
+      }
     }
 
     this.setState(state)
@@ -348,6 +349,7 @@ export default class extends Component {
    */
   onScrollEnd = e => {
     this.props.onScrollEnd && this.props.onScrollEnd(e.nativeEvent.contentOffset)
+    // this.props.onPageSelected && this.props.onPageSelected()
     // update scroll state
     this.internals.isScrolling = false
 
@@ -423,7 +425,6 @@ export default class extends Component {
     newState.loopJump = loopJump
 
     this.internals.offset = offset
-
     // only update offset in state if loopJump is true
     if (loopJump) {
       // when swiping to the beginning of a looping set for the third time,
@@ -461,11 +462,11 @@ export default class extends Component {
     if (state.dir === 'x') x = diff * state.width
     if (state.dir === 'y') y = diff * state.height
 
-    // if (Platform.OS !== 'ios') {
-    //   this.scrollView && this.scrollView[animated ? 'setPage' : 'setPageWithoutAnimation'](diff)
-    // } else {
+    if (Platform.OS !== 'ios') {
+      this.scrollView && this.scrollView[animated ? 'setPage' : 'setPageWithoutAnimation'](diff)
+    } else {
       this.scrollView && this.scrollView.scrollTo({ x, y, animated })
-    // }
+    }
 
     // update scroll state
     this.internals.isScrolling = true
@@ -474,8 +475,8 @@ export default class extends Component {
     })
 
     // trigger onScrollEnd manually in android
-    // if (!animated || Platform.OS !== 'ios') {
-    if (!animated) {
+    if (!animated || Platform.OS !== 'ios') {
+    // if (!animated) {
       setImmediate(() => {
         this.onScrollEnd({
           nativeEvent: {
@@ -621,8 +622,10 @@ export default class extends Component {
     this.scrollView = view;
   }
 
+  androidDisabledScroll = (scrollEnabled) => this.state.scrollEnabled !== scrollEnabled && this.setState({ scrollEnabled });
+
   renderScrollView = pages => {
-    // if (Platform.OS === 'ios') {
+    if (Platform.OS === 'ios') {
       return (
         <ScrollView ref={this.refScrollView}
           {...this.props}
@@ -636,17 +639,19 @@ export default class extends Component {
           {pages}
         </ScrollView>
        )
-    // }
-    // return (
-    //   <ViewPagerAndroid ref={this.refScrollView}
-    //     {...this.props}
-    //     initialPage={this.props.loop ? this.state.index + 1 : this.state.index}
-    //     onPageSelected={this.onScrollEnd}
-    //     key={pages.length}
-    //     style={[styles.wrapperAndroid, this.props.style]}>
-    //     {pages}
-    //   </ViewPagerAndroid>
-    // )
+    }
+    return (
+      <ViewPagerAndroid ref={this.refScrollView}
+        {...this.props}
+        scrollEnabled={this.state.scrollEnabled}
+        onPageScroll={(e) => this.props.onPageScroll && this.props.onPageScroll(e.nativeEvent)}
+        initialPage={this.props.loop ? this.state.index + 1 : this.state.index}
+        onPageSelected={this.onScrollEnd}
+        key={pages.length}
+        style={[styles.wrapperAndroid, this.props.style]}>
+        {pages}
+      </ViewPagerAndroid>
+    )
   }
 
   /**
