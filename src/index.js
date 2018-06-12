@@ -454,14 +454,27 @@ export default class extends Component {
    */
 
   scrollBy = (index, animated = true) => {
+    if (diff < 0 || diff > this.state.total - 1) return
     if (this.internals.isScrolling || this.state.total < 2) return
+    this.internals.isScrolling = false
     const state = this.state
     const diff = (this.props.loop ? 1 : 0) + index + this.state.index
     let x = 0
     let y = 0
-    if (state.dir === 'x') x = diff * state.width
-    if (state.dir === 'y') y = diff * state.height
+    let contentOffset;
+    if (state.dir === 'x') {
+      x = diff * state.width
+      contentOffset = {x}
+    }
+    if (state.dir === 'y') {
+      y = diff * state.height
+      contentOffset = {y}
+    }
 
+    this.updateIndex(contentOffset, state.dir, () => {
+      this.autoplay()
+      this.loopJump()
+    })
     if (Platform.OS !== 'ios') {
       this.scrollView && this.scrollView[animated ? 'setPage' : 'setPageWithoutAnimation'](diff)
     } else {
@@ -469,7 +482,6 @@ export default class extends Component {
     }
 
     // update scroll state
-    this.internals.isScrolling = true
     this.setState({
       autoplayEnd: false
     })
