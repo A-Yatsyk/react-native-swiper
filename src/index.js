@@ -454,7 +454,6 @@ export default class extends Component {
    */
 
   scrollBy = (index, animated = true) => {
-    if (diff < 0 || diff > this.state.total - 1) return
     if (this.internals.isScrolling || this.state.total < 2) return
     this.internals.isScrolling = false
     const state = this.state
@@ -464,11 +463,11 @@ export default class extends Component {
     let contentOffset;
     if (state.dir === 'x') {
       x = diff * state.width
-      contentOffset = {x}
+      contentOffset = {y, x}
     }
     if (state.dir === 'y') {
       y = diff * state.height
-      contentOffset = {y}
+      contentOffset = {y, x}
     }
 
     this.updateIndex(contentOffset, state.dir, () => {
@@ -525,7 +524,6 @@ export default class extends Component {
         overrides[prop] = (e) => originResponder(e, this.fullState(), this)
       }
     }
-
     return overrides
   }
 
